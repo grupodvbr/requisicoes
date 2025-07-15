@@ -30,6 +30,22 @@
     .btn-blue { background: #2196F3; color: #fff; }
     .btn-red { background: #f44336; color: #fff; }
     #msg { text-align: center; margin-top: 10px; font-weight: bold; }
+    #spinner {
+      display: none;
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #2196F3;
+      border-radius: 50%;
+      width: 60px; height: 60px;
+      animation: spin 1s linear infinite;
+      z-index: 100;
+    }
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
   </style>
 </head>
 <body>
@@ -46,8 +62,8 @@
     <option value="Bruna">Bruna</option>
     <option value="Renan">Renan</option>
     <option value="Raimundo">Raimundo</option>
-  <option value="Cleide">Cleide</option>
-      <option value="Ricardo">Ricardo</option>
+    <option value="Cleide">Cleide</option>
+    <option value="Ricardo">Ricardo</option>
     <option value="Larissa">Larissa</option>
     <option value="Gabriel">Gabriel</option>
     <option value="Valcir">Valcir</option>
@@ -69,24 +85,20 @@
     <option value="Marcelo">Marcelo</option>
     <option value="Juciara">Juciara</option>
     <option value="Aline Santos">Aline Santos</option>
-    <option value="Aline Rodrigues">Aline Rodrigues</option>
-
+    <option value="Aline Rodrigues">Aline Rodrigues</option>
     <option value="Geane">Geane</option>
-    <!-- ... -->
   </select>
 
   <label>Setor:</label>
   <select id="setor">
     <option value="">Selecione o setor</option>
     <option value="Cozinha">Cozinha</option>
-   <option value="Limpeza">Limpeza</option>
-   <option value="Sushi">Sushi</option>
-   <option value="Garçons">Garçons</option>
-   <option value="Gerência">Gerência</option>
-   <option value="Pizzaria">Pizzaria</option>
+    <option value="Limpeza">Limpeza</option>
+    <option value="Sushi">Sushi</option>
+    <option value="Garçons">Garçons</option>
+    <option value="Gerência">Gerência</option>
+    <option value="Pizzaria">Pizzaria</option>
     <option value="Bar">Bar</option>
-    <option value="Churrascaria PF">Churrascaria PF</option>
-    <option value="Buffet">Buffet</option>
     <option value="Caixa">Caixa</option>
   </select>
 
@@ -102,15 +114,18 @@
     <button type="button" onclick="selecionarUnidade(this, 'UN.')">UN.</button>
     <button type="button" onclick="selecionarUnidade(this, 'CX')">CX</button>
     <button type="button" onclick="selecionarUnidade(this, 'L')">L</button>
-    <button type="button" onclick="selecionarUnidade(this, 'L')">PC</button>
+    <button type="button" onclick="selecionarUnidade(this, 'PC')">PC</button>
     <button type="button" onclick="selecionarUnidade(this, 'KG')">KG</button>
   </div>
 
   <label>Observações:</label>
   <textarea id="observacoes" placeholder="Observações gerais"></textarea>
 
-  <!-- BOTÃO UNICO ENVIAR -->
-  <button class="btn-blue" onclick="enviarItem()">ENVIAR ITEM</button>
+  <!-- Spinner -->
+  <div id="spinner"></div>
+
+  <!-- BOTÕES -->
+  <button id="btn-enviar" class="btn-blue" onclick="enviarItem()">ENVIAR ITEM</button>
   <button class="btn-red" onclick="limparTabela()">LIMPAR HISTÓRICO</button>
 
   <p id="msg"></p>
@@ -123,39 +138,17 @@
 
 <script>
   const solicitanteSenhas = {
-    "ADM": "00",
-    "Ruan": "Ruan10",
-    "Renata": "Renata12",
-   "Lu": "Lu26",
-   "Bruna": "Bruna48",
-   "Renan": "Renan78",
-   "Raimundo": "Raimundo47",
-   "Cleide": "Cleide98",
-   "Ricardo": "Ricardo41",
-   "Larissa": "Larissa56",
-   "Valcir": "Valcir24",
-   "Tailson": "Tailson97",
-   "Dheure": "Dheure73",
-   "Neval": "Neval34",
-   "Agnaldo": "Agnaldo67",
-   "Genison": "Genison35",
-   "Dorilson": "Dorilson8",
-   "joane": "joane6",
-   "Vanial": "Vanial86",
-   "Adriana": "Adriana49",   
-   "Ivaneide": "Ivaneide46",
-   "Geane": "Geane83",
-   "Luziânia": "Luziânia8",
-   "Rosemeire": "Rosemeire30",
-   "Wilma": "Wilma87",
-   "Gabriel": "Gabriel5",
-   "Islane": "Islane78",
-   "Marcelo": "Marcelo75",
-   "Juciara": "Juciara35",
-   "Aline Santos": "Aline32",
-   "Aline Rodrigues": "Aline59",
-    "Quiteria": "Quiteria43"
-    // ... outros
+    "ADM": "00", "Ruan": "Ruan10", "Renata": "Renata12",
+    "Lu": "Lu26", "Bruna": "Bruna48", "Renan": "Renan78",
+    "Raimundo": "Raimundo47", "Cleide": "Cleide98", "Ricardo": "Ricardo41",
+    "Larissa": "Larissa56", "Valcir": "Valcir24", "Tailson": "Tailson97",
+    "Dheure": "Dheure73", "Neval": "Neval34", "Agnaldo": "Agnaldo67",
+    "Genison": "Genison35", "Dorilson": "Dorilson8", "joane": "joane6",
+    "Vanial": "Vanial86", "Adriana": "Adriana49", "Ivaneide": "Ivaneide46",
+    "Geane": "Geane83", "Luziânia": "Luziânia8", "Rosemeire": "Rosemeire30",
+    "Wilma": "Wilma87", "Gabriel": "Gabriel5", "Islane": "Islane78",
+    "Marcelo": "Marcelo75", "Juciara": "Juciara35", "Aline Santos": "Aline32",
+    "Aline Rodrigues": "Aline59", "Quiteria": "Quiteria43"
   };
 
   let produtos = [];
@@ -167,7 +160,7 @@
   const autocompleteList = document.getElementById('autocomplete-list');
   const solicitanteInput = document.getElementById('solicitante');
 
-  // Autocomplete de produtos
+  // Autocomplete
   fetch("https://script.google.com/macros/s/YOUR_AUTOCOMPLETE_API/exec")
     .then(r => r.json()).then(data => produtos = data);
 
@@ -192,7 +185,6 @@
     btn.classList.add('ativo');
   }
 
-  // Solicita senha assim que escolher solicitante
   solicitanteInput.addEventListener('change', () => {
     const solicitante = solicitanteInput.value.trim();
     if (solicitante) {
@@ -220,8 +212,10 @@
       return;
     }
 
-    const horaEnvio = new Date().toLocaleTimeString();
+    document.getElementById('spinner').style.display = 'block';
+    document.getElementById('btn-enviar').disabled = true;
 
+    const horaEnvio = new Date().toLocaleTimeString();
     const data = new URLSearchParams();
     data.append('tipoFormulario', 'Requisição');
     data.append('Item', item);
@@ -244,10 +238,14 @@
       document.getElementById('quantidade').value = '';
       unidadeSelecionada = '';
       document.querySelectorAll('.unidades button').forEach(b => b.classList.remove('ativo'));
+      document.getElementById('spinner').style.display = 'none';
+      document.getElementById('btn-enviar').disabled = false;
     })
     .catch(err => {
       console.error(err);
       document.getElementById('msg').innerText = "Enviado, favor confirmar com o setor o recebimento do pedido";
+      document.getElementById('spinner').style.display = 'none';
+      document.getElementById('btn-enviar').disabled = false;
     });
   }
 
