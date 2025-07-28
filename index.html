@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Requisição de Compras - DELÍCIA GOURMET</title>
+  <title>Requisição de Compras - DELÍCIA GOURMETt</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <style>
     body { font-family: Arial, sans-serif; background: #f5f5f5; display: flex; justify-content: center; padding: 30px; }
@@ -92,8 +92,7 @@
   <label>Setor:</label>
   <select id="setor">
     <option value="">Selecione o setor</option>
-    <option value="Cozinha">Cozinha Dia</option>
-    <option value="Cozinha">Cozinha Noite</option>
+    <option value="Cozinha">Cozinha</option>
     <option value="Limpeza">Limpeza</option>
     <option value="Sushi">Sushi</option>
     <option value="Garçons">Garçons</option>
@@ -154,6 +153,7 @@
 
   let produtos = [];
   let unidadeSelecionada = '';
+  let enviados = [];
   let senhaAutenticada = '';
 
   const itemInput = document.getElementById('item');
@@ -249,7 +249,19 @@
     });
   }
 
-  
+  function atualizarTabela() {
+    const tabela = document.getElementById('historico');
+    tabela.innerHTML = `<tr><th>Produto</th><th>Unidade</th><th>Qtd</th><th>Setor</th><th>Hora</th></tr>`;
+    enviados.forEach(i => {
+      const row = tabela.insertRow();
+      row.insertCell(0).innerText = i.item;
+      row.insertCell(1).innerText = i.unidade;
+      row.insertCell(2).innerText = i.quantidade;
+      row.insertCell(3).innerText = i.setor;
+      row.insertCell(4).innerText = i.hora;
+    });
+  }
+
   function limparTabela() {
     enviados = [];
     atualizarTabela();
@@ -261,6 +273,55 @@ let enviados = JSON.parse(localStorage.getItem('historicoRequisicao')) || [];
 // Chama isso ao abrir a página para montar a tabela com histórico salvo
 atualizarTabela();
 
+function enviarItem() {
+  const solicitante = solicitanteInput.value.trim();
+  const setor = document.getElementById('setor').value.trim();
+  const item = itemInput.value.trim();
+  const quantidade = document.getElementById('quantidade').value.trim();
+  const observacoes = document.getElementById('observacoes').value.trim();
+
+  if (!solicitante || !setor || !item || !quantidade || !unidadeSelecionada || !senhaAutenticada) {
+    document.getElementById('msg').innerText = "⚠️ Preencha todos os campos e autentique!";
+    return;
+  }
+
+  document.getElementById('spinner').style.display = 'block';
+  document.getElementById('btn-enviar').disabled = true;
+
+  const horaEnvio = new Date().toLocaleTimeString();
+  const data = new URLSearchParams();
+  data.append('tipoFormulario', 'Requisição');
+  data.append('Item', item);
+  data.append('Unidade', unidadeSelecionada);
+  data.append('Quantidade', quantidade);
+  data.append('Setor', setor);
+  data.append('Solicitante', solicitante);
+  data.append('Observacoes', observacoes);
+
+  fetch('https://script.google.com/macros/s/AKfycby8K9Z8pmysdQZWnFIbBEjpDL3QvzNLRCy1jp33MKY7c5a_yvtIhtCudL-CrCpwRfhxwA/exec', {
+    method: 'POST',
+    body: data
+  })
+  .then(r => r.text())
+  .then(txt => {
+    document.getElementById('msg').innerText = "✅ Item enviado!";
+    enviados.push({ item, unidade: unidadeSelecionada, quantidade, setor, hora: horaEnvio });
+    localStorage.setItem('historicoRequisicao', JSON.stringify(enviados)); // Salva no localStorage!
+    atualizarTabela();
+    itemInput.value = '';
+    document.getElementById('quantidade').value = '';
+    unidadeSelecionada = '';
+    document.querySelectorAll('.unidades button').forEach(b => b.classList.remove('ativo'));
+    document.getElementById('spinner').style.display = 'none';
+    document.getElementById('btn-enviar').disabled = false;
+  })
+  .catch(err => {
+    console.error(err);
+    document.getElementById('msg').innerText = "⚠️ Erro: confira o recebimento com o setor.";
+    document.getElementById('spinner').style.display = 'none';
+    document.getElementById('btn-enviar').disabled = false;
+  });
+}
 
 function atualizarTabela() {
   const tabela = document.getElementById('historico');
