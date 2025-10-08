@@ -59,7 +59,7 @@
     <option>Geane</option>
   </select>
 
-   <label>Setor:</label>
+  <label>Setor:</label>
   <select id="setor">
     <option value="">Selecione o setor</option>
     <option>Cozinha</option>
@@ -74,7 +74,8 @@
   </select>
 
   <label>Produto:</label>
-  <input type="text" id="item" placeholder="Digite o produto">
+  <input list="produtos" id="item" placeholder="Digite ou selecione o produto">
+  <datalist id="produtos"></datalist>
 
   <label>Quantidade:</label>
   <input type="number" id="quantidade" min="1">
@@ -143,6 +144,21 @@
     }
   });
 
+  // 🔹 Buscar produtos existentes da planilha
+  async function carregarProdutos() {
+    try {
+      const res = await fetch(`${URL_GAS}?acao=ler`);
+      const dados = await res.json();
+      const produtos = [...new Set(dados.map(l => l[1]).filter(Boolean))]; // coluna B: Produto
+      const lista = document.getElementById("produtos");
+      lista.innerHTML = produtos.map(p => `<option value="${p}">`).join('');
+    } catch {
+      console.error("Erro ao carregar lista de produtos");
+    }
+  }
+
+  carregarProdutos();
+
   function enviarItem() {
     const solicitante = document.getElementById('solicitante').value.trim();
     const setor = document.getElementById('setor').value.trim();
@@ -178,6 +194,7 @@
       atualizarTabela();
       alert("✅ Item enviado com sucesso!");
       limparCampos();
+      carregarProdutos(); // atualiza a lista de produtos com o novo nome
     })
     .catch(() => {
       document.getElementById('msg').innerText = "❌ Erro ao enviar!";
@@ -222,6 +239,5 @@
 
   atualizarTabela();
 </script>
-
 </body>
 </html>
