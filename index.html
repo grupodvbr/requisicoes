@@ -59,7 +59,7 @@
     <option>Geane</option>
   </select>
 
-  <label>Setor:</label>
+   <label>Setor:</label>
   <select id="setor">
     <option value="">Selecione o setor</option>
     <option>Cozinha</option>
@@ -74,8 +74,7 @@
   </select>
 
   <label>Produto:</label>
-  <input list="produtos" id="item" placeholder="Digite ou selecione o produto">
-  <datalist id="produtos"></datalist>
+  <input type="text" id="item" placeholder="Digite o produto">
 
   <label>Quantidade:</label>
   <input type="number" id="quantidade" min="1">
@@ -104,7 +103,7 @@
 </div>
 
 <script>
-  const URL_GAS = "https://script.google.com/macros/s/AKfycbyRVb54fICa7c_O20paQI48jdkb98uFkM2pz6sf9q-z_jHR3BZ7A4BPpK5xNFTEHvQ6zw/exec";
+  const URL_GAS = "https://script.google.com/macros/s/AKfycbyXFEAq56G7oQdeCzGw_SdOnQ7XkRPMzBoS1V09Pkk_wI916FGO9nn4e9FfeNmv8KV9KA/exec";
 
   // 🔑 Senhas de cada solicitante
   const solicitanteSenhas = {
@@ -144,21 +143,6 @@
     }
   });
 
-  // 🔹 Buscar produtos existentes da planilha
-  async function carregarProdutos() {
-    try {
-      const res = await fetch(`${URL_GAS}?acao=ler`);
-      const dados = await res.json();
-      const produtos = [...new Set(dados.map(l => l[1]).filter(Boolean))]; // coluna B: Produto
-      const lista = document.getElementById("produtos");
-      lista.innerHTML = produtos.map(p => `<option value="${p}">`).join('');
-    } catch {
-      console.error("Erro ao carregar lista de produtos");
-    }
-  }
-
-  carregarProdutos();
-
   function enviarItem() {
     const solicitante = document.getElementById('solicitante').value.trim();
     const setor = document.getElementById('setor').value.trim();
@@ -194,7 +178,6 @@
       atualizarTabela();
       alert("✅ Item enviado com sucesso!");
       limparCampos();
-      carregarProdutos(); // atualiza a lista de produtos com o novo nome
     })
     .catch(() => {
       document.getElementById('msg').innerText = "❌ Erro ao enviar!";
@@ -239,5 +222,6 @@
 
   atualizarTabela();
 </script>
+
 </body>
 </html>
